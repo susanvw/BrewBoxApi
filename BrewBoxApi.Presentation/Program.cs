@@ -9,6 +9,8 @@ using BrewBoxApi.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using BrewBoxApi.Infrastructure.Identity;
 using BrewBoxApi.Domain.Aggregates.Orders;
+using BrewBoxApi.Presentation.Features.Auth;
+using BrewBoxApi.Presentation.Features.Orders;
 using BrewBoxApi.Presentation.Services;
 using BrewBoxApi.Presentation.Filters;
 
@@ -50,6 +52,9 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
 });
+
+builder.Services.AddScoped<IOrderControllerImplementation, OrderControllerImplementation>();
+builder.Services.AddScoped<IAuthControllerImplementation, AuthControllerImplementation>();
 
 // Add Services and Repositories
 builder.Services.AddHttpContextAccessor();

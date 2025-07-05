@@ -13,7 +13,7 @@ namespace BrewBoxApi.Presentation.Features.Orders;
 public class OrdersController(IOrderControllerImplementation implementation) : ControllerBase
 {
     [HttpGet("{id}")]
-    [Authorize(Roles = "Barista")]
+    [Authorize(Roles = "Barista, User")]
     public async Task<ActionResult<OrderView>> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
         var order = await implementation.GetByIdAsync(id, cancellationToken);

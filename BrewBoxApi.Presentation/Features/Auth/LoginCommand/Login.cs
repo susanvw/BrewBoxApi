@@ -1,6 +1,2 @@
 namespace BrewBoxApi.Presentation.Features.Auth.LoginCommand;
-
-public class Login
-{
-    
-}
+ public record LoginRequest(string Email, string Password);

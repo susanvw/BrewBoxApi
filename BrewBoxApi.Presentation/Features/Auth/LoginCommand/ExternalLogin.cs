@@ -1,6 +1,3 @@
 namespace BrewBoxApi.Presentation.Features.Auth.LoginCommand;
 
-public class ExternalLogin
-{
-    
-}
+public record ExternalLoginRequest(string Provider, string Token);
