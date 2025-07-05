@@ -1,45 +1,38 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using BrewBoxApi.Application.Common.Interfaces;
 using BrewBoxApi.Domain.SeedWork;
+using BrewBoxApi.Infrastructure.Identity;
 
-namespace BrewBoxApi.Infrastructure.Interceptors
+namespace BrewBoxApi.Infrastructure.Interceptors;
+
+public class AuditInterceptor(ICurrentUserService currentUserService) : SaveChangesInterceptor
 {
-    public class AuditInterceptor : SaveChangesInterceptor
+    public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
-        private readonly ICurrentUserService _currentUserService;
+        UpdateAuditFields(eventData.Context);
+        return base.SavingChanges(eventData, result);
+    }
 
-        public AuditInterceptor(ICurrentUserService currentUserService)
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData,
+        InterceptionResult<int> result, CancellationToken cancellationToken = default)
+    {
+        UpdateAuditFields(eventData.Context);
+        return base.SavingChangesAsync(eventData, result, cancellationToken);
+    }
+
+    private void UpdateAuditFields(DbContext? context)
+    {
+        if (context == null) return;
+
+        var entries = context.ChangeTracker
+            .Entries()
+            .Where(e => e.Entity is BaseModel && e.State == EntityState.Added);
+
+        foreach (var entry in entries)
         {
-            _currentUserService = currentUserService;
-        }
-
-        public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
-        {
-            UpdateAuditFields(eventData.Context);
-            return base.SavingChanges(eventData, result);
-        }
-
-        public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
-        {
-            UpdateAuditFields(eventData.Context);
-            return base.SavingChangesAsync(eventData, result, cancellationToken);
-        }
-
-        private void UpdateAuditFields(DbContext? context)
-        {
-            if (context == null) return;
-
-            var entries = context.ChangeTracker
-                .Entries()
-                .Where(e => e.Entity is BaseModel && e.State == EntityState.Added);
-
-            foreach (var entry in entries)
-            {
-                var entity = (BaseModel)entry.Entity;
-                entity.CreatedOn = DateTime.UtcNow;
-                entity.CreatedBy = _currentUserService.UserId ?? "System";
-            }
+            var entity = (BaseModel)entry.Entity;
+            entity.CreatedOn = DateTime.UtcNow;
+            entity.CreatedBy = currentUserService.UserId ?? "System";
         }
     }
 }

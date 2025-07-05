@@ -1,0 +1,66 @@
+using BrewBoxApi.Domain.Aggregates.Orders;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+
+namespace BrewBoxApi.Infrastructure;
+
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+      : IdentityDbContext<IdentityUser>(options)
+{
+      public DbSet<Order> Orders { get; set; }
+      public DbSet<Drink> Drinks { get; set; }
+
+      protected override void OnModelCreating(ModelBuilder builder)
+      {
+            base.OnModelCreating(builder);
+
+            // Configure Order entity
+            builder.Entity<Order>(entity =>
+            {
+                  entity.HasKey(o => o.Id);
+                  entity.Property(o => o.Id).HasMaxLength(36);
+                  entity.Property(o => o.Status)
+                        .HasConversion<string>()
+                        .HasMaxLength(50);
+                  entity.Property(o => o.TotalPrice)
+                        .HasColumnType("decimal(18,2)");
+                  entity.Property(o => o.Tip)
+                        .HasColumnType("decimal(18,2)");
+                  entity.Property(o => o.CreatedBy)
+                        .HasMaxLength(36);
+                  entity.HasOne(o => o.User)
+                        .WithMany()
+                        .HasForeignKey(o => o.CreatedBy)
+                        .OnDelete(DeleteBehavior.Restrict);
+                  entity.HasOne(o => o.Barista)
+                        .WithMany()
+                        .HasForeignKey(o => o.BaristaId)
+                        .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Configure Drink entity
+            builder.Entity<Drink>(entity =>
+            {
+                  entity.HasKey(d => d.Id);
+                  entity.Property(d => d.Id).HasMaxLength(36);
+                  entity.Property(d => d.Type)
+                        .HasMaxLength(100);
+                  entity.Property(d => d.Size)
+                        .HasConversion<string>()
+                        .HasMaxLength(50);
+                  entity.Property(d => d.Price)
+                        .HasColumnType("decimal(18,2)");
+                  entity.Property(d => d.CreatedBy)
+                        .HasMaxLength(36);
+                  entity.HasOne(d => d.Order)
+                        .WithMany(o => o.Drinks)
+                        .HasForeignKey(d => d.OrderId)
+                        .OnDelete(DeleteBehavior.Cascade);
+                  entity.HasOne(d => d.User)
+                        .WithMany()
+                        .HasForeignKey(d => d.CreatedBy)
+                        .OnDelete(DeleteBehavior.Restrict);
+            });
+      }
+}

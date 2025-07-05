@@ -1,4 +1,4 @@
-namespace BrewBoxApi.Domain.Entities;
+namespace BrewBoxApi.Domain.Aggregates.Orders;
 
 public enum DrinkSize
 {

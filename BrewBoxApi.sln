@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrewBoxApi.Domain", "BrewBoxApi.Domain\BrewBoxApi.Domain.csproj", "{C0EE2132-C5FF-414C-BCDE-281C1214ACEE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrewBoxApi.Infrastructure", "BrewBoxApi.Infrastructure\BrewBoxApi.Infrastructure.csproj", "{B9CF48C3-35D8-4D9E-8F20-00E771AA551D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrewBoxApi.Application", "BrewBoxApi.Application\BrewBoxApi.Application.csproj", "{90637DB6-08CD-4FBA-B944-82F8B7DC006F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrewBoxApi.Presentation", "BrewBoxApi.Presentation\BrewBoxApi.Presentation.csproj", "{CA4B74D0-1B97-4D9B-8715-B2729F6C174B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C0EE2132-C5FF-414C-BCDE-281C1214ACEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0EE2132-C5FF-414C-BCDE-281C1214ACEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0EE2132-C5FF-414C-BCDE-281C1214ACEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0EE2132-C5FF-414C-BCDE-281C1214ACEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9CF48C3-35D8-4D9E-8F20-00E771AA551D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9CF48C3-35D8-4D9E-8F20-00E771AA551D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9CF48C3-35D8-4D9E-8F20-00E771AA551D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9CF48C3-35D8-4D9E-8F20-00E771AA551D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90637DB6-08CD-4FBA-B944-82F8B7DC006F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90637DB6-08CD-4FBA-B944-82F8B7DC006F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90637DB6-08CD-4FBA-B944-82F8B7DC006F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90637DB6-08CD-4FBA-B944-82F8B7DC006F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA4B74D0-1B97-4D9B-8715-B2729F6C174B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA4B74D0-1B97-4D9B-8715-B2729F6C174B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA4B74D0-1B97-4D9B-8715-B2729F6C174B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA4B74D0-1B97-4D9B-8715-B2729F6C174B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
