@@ -6,13 +6,13 @@ using System.Text;
 using BrewBoxApi.Infrastructure;
 using BrewBoxApi.Infrastructure.Interceptors;
 using BrewBoxApi.Infrastructure.Repositories;
+using BrewBoxApi.Presentation.Filters;
 using Microsoft.AspNetCore.Identity;
 using BrewBoxApi.Infrastructure.Identity;
-using BrewBoxApi.Domain.Aggregates.Orders;
+using BrewBoxApi.Presentation.Services;
 using BrewBoxApi.Presentation.Features.Auth;
 using BrewBoxApi.Presentation.Features.Orders;
-using BrewBoxApi.Presentation.Services;
-using BrewBoxApi.Presentation.Filters;
+using BrewBoxApi.Domain.Aggregates.Orders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +30,22 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
+
+// Configure CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", builder =>
+    {
+        builder.WithOrigins("http://localhost:5173")
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials()
+               .SetPreflightMaxAge(TimeSpan.FromSeconds(86400));
+    });
+});
+
+// Configure Authorization
+builder.Services.AddAuthorization();
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -51,14 +67,29 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            if (context.Request.Method == "OPTIONS")
+            {
+                context.Response.StatusCode = 204;
+                context.Response.Headers.Append("Access-Control-Allow-Origin", "http://localhost:5173");
+                context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                context.Response.Headers.Append("Access-Control-Allow-Headers", "Authorization, Content-Type");
+                context.Response.Headers.Append("Access-Control-Allow-Credentials", "true");
+                return Task.CompletedTask;
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
-
-builder.Services.AddScoped<IOrderControllerImplementation, OrderControllerImplementation>();
-builder.Services.AddScoped<IAuthControllerImplementation, AuthControllerImplementation>();
 
 // Add Services and Repositories
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<IAuthControllerImplementation, AuthControllerImplementation>();
+builder.Services.AddScoped<IOrderControllerImplementation, OrderControllerImplementation>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 // Add Exception Filter
@@ -96,6 +127,15 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Configure HTTPS port
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5196, listenOptions =>
+    {
+        listenOptions.UseHttps();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -105,10 +145,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowReactApp");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
-await app.RunAsync();
+app.Run();
