@@ -27,11 +27,26 @@ appsettings.json
 
 .NET
 
-*.csproj.user bin/ obj/ *.suo *.user *.userosscache *.sln.docstates *.pdb *.cache *.bak *.log *.vs/ *.vscode/ *.idea/
+*.csproj.user 
+bin/ 
+obj/ 
+*.suo 
+*.user 
+*.userosscache 
+*.sln.docstates 
+*.pdb 
+*.cache 
+*.bak 
+*.log 
+*.vs/ 
+*.vscode/ 
+*.idea/
 
 Sensitive files
 
-appsettings.json appsettings.*.json secrets.json
+appsettings.json 
+appsettings.*.json 
+secrets.json
 
 User secrets
 
