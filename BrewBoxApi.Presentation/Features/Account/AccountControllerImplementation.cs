@@ -12,6 +12,7 @@ namespace BrewBoxApi.Presentation.Features.Account;
 
 internal sealed class AccountControllerImplementation(
 UserManager<IdentityUser> userManager,
+RoleManager<IdentityRole> roleManager,
 IConfiguration configuration
 ) : IAccountControllerImplementation
 {
@@ -25,7 +26,13 @@ IConfiguration configuration
         {
             return result;
         }
-        await userManager.AddToRoleAsync(user, "Barista");
+
+        if (!await roleManager.RoleExistsAsync(request.Role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(request.Role));
+        }
+
+        await userManager.AddToRoleAsync(user, request.Role);
         return result;
     }
 

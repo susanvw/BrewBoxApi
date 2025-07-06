@@ -27,11 +27,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                         .HasColumnType("decimal(18,2)");
                   entity.Property(o => o.Tip)
                         .HasColumnType("decimal(18,2)");
-                  entity.Property(o => o.CreatedBy)
-                        .HasMaxLength(36);
-                  entity.HasOne(o => o.User)
+                  entity.Property(o => o.CreatedById)
+                        .HasMaxLength(450);
+                  entity.HasOne(o => o.CreatedBy)
                         .WithMany()
-                        .HasForeignKey(o => o.CreatedBy)
+                        .HasForeignKey(o => o.CreatedById)
                         .OnDelete(DeleteBehavior.Restrict);
                   entity.HasOne(o => o.Barista)
                         .WithMany()
@@ -43,7 +43,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             builder.Entity<Drink>(entity =>
             {
                   entity.HasKey(d => d.Id);
-                  entity.Property(d => d.Id).HasMaxLength(36);
+                  entity.Property(d => d.Id).HasMaxLength(16);
                   entity.Property(d => d.Type)
                         .HasMaxLength(100);
                   entity.Property(d => d.Size)
@@ -51,15 +51,16 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                         .HasMaxLength(50);
                   entity.Property(d => d.Price)
                         .HasColumnType("decimal(18,2)");
-                  entity.Property(d => d.CreatedBy)
-                        .HasMaxLength(36);
+                  entity.Property(d => d.CreatedById)
+                        .HasMaxLength(450);
                   entity.HasOne(d => d.Order)
                         .WithMany(o => o.Drinks)
                         .HasForeignKey(d => d.OrderId)
                         .OnDelete(DeleteBehavior.Cascade);
-                  entity.HasOne(d => d.User)
+
+                  entity.HasOne(d => d.CreatedBy)
                         .WithMany()
-                        .HasForeignKey(d => d.CreatedBy)
+                        .HasForeignKey(d => d.CreatedById)
                         .OnDelete(DeleteBehavior.Restrict);
             });
       }

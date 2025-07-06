@@ -32,7 +32,7 @@ public class AuditInterceptor(ICurrentUserService currentUserService) : SaveChan
         {
             var entity = (BaseModel)entry.Entity;
             entity.CreatedOn = DateTime.UtcNow;
-            entity.CreatedBy = currentUserService.UserId ?? "System";
+            entity.CreatedById = currentUserService.UserId ?? "System";
         }
     }
 }
