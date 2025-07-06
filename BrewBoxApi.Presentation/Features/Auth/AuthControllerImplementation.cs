@@ -1,9 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using BrewBoxApi.Presentation.Features.Account.RegisterCommand;
 using BrewBoxApi.Presentation.Features.Auth.LoginCommand;
 using BrewBoxApi.Presentation.Features.Auth.Models;
-using BrewBoxApi.Presentation.Features.Auth.RegisterCommand;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
@@ -14,19 +14,6 @@ internal sealed class AuthControllerImplementation(
     SignInManager<IdentityUser> signInManager,
     IConfiguration configuration) : IAuthControllerImplementation
 {
-    public async ValueTask<IdentityResult> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
-    { 
-        var user = new IdentityUser { UserName = request.Email, Email = request.Email };
-        var result = await userManager.CreateAsync(user, request.Password);
-
-        if (!result.Succeeded)
-        {
-            return result;
-        }
-        await userManager.AddToRoleAsync(user, "Barista");
-        return result;
-    }
-
     public async ValueTask<AuthView> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
     {
         var user = await userManager.FindByEmailAsync(request.Email);

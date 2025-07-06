@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using BrewBoxApi.Presentation.Features.Auth.LoginCommand;
-using BrewBoxApi.Presentation.Features.Auth.RegisterCommand;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BrewBoxApi.Presentation.Features.Auth;
@@ -9,19 +8,6 @@ namespace BrewBoxApi.Presentation.Features.Auth;
 [Route("api/[controller]")]
 public class AuthController(IAuthControllerImplementation implementation) : ControllerBase
 {
-    [HttpPost("register")]
-    public async Task<ActionResult> RegisterAsync([FromBody] RegisterRequest request, CancellationToken cancellationToken = default)
-    {
-        var result = await implementation.RegisterAsync(request, cancellationToken);
-
-        if (!result.Succeeded)
-        {
-            return BadRequest(new { error = "Registration failed", details = result.Errors.Select(e => e.Description) });
-        }
-        
-        return Ok(new { message = "User registered successfully" });
-    }
-
     [HttpPost("login")]
     public async Task<ActionResult> LoginAsync([FromBody] LoginRequest request,
         CancellationToken cancellationToken = default)

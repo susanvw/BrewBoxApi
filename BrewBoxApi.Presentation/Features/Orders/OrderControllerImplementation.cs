@@ -32,9 +32,7 @@ public sealed class OrderControllerImplementation(IOrderRepository orderReposito
 
     public async ValueTask<List<OrderView>> GetAllActiveByUserIdAsync(CancellationToken cancellationToken = default)
     {
-        var userId = currentUserService.UserId;
-        ArgumentException.ThrowIfNullOrEmpty(userId);
-
+        var userId = currentUserService.UserId ?? throw new UnauthorizedAccessException("User could not be found.");
         var list = await orderRepository.GetAllActiveByUserIdAsync(userId, cancellationToken);
 
         return [.. list.Select(OrderView.MapFrom)];
@@ -42,8 +40,7 @@ public sealed class OrderControllerImplementation(IOrderRepository orderReposito
 
     public async ValueTask<List<OrderView>> GetAllByUserIdAsync(CancellationToken cancellationToken = default)
     {
-        var userId = currentUserService.UserId;
-        ArgumentException.ThrowIfNullOrEmpty(userId);
+        var userId = currentUserService.UserId ?? throw new UnauthorizedAccessException("User could not be found.");
 
         var list = await orderRepository.GetAllByUserIdAsync(userId, cancellationToken);
 
