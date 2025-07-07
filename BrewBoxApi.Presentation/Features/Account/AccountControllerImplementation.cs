@@ -7,6 +7,9 @@ using BrewBoxApi.Presentation.Features.Auth.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Google.Apis.Auth;
+using FluentValidation;
+using BrewBoxApi.Presentation.Features.SeedWork;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace BrewBoxApi.Presentation.Features.Account;
 
@@ -17,42 +20,47 @@ IConfiguration configuration
 ) : IAccountControllerImplementation
 {
 
-    public async ValueTask<IdentityResult> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
+    public async ValueTask<BaseResponse<string>> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
     {
+        var validator = new RegisterValidator();
+        await validator.ValidateAndThrowAsync(request, cancellationToken);
+
         var user = new IdentityUser { UserName = request.Email, Email = request.Email };
-        var result = await userManager.CreateAsync(user, request.Password);
+        var result = await userManager.CreateAsync(user, request.Password!);
 
         if (!result.Succeeded)
         {
-            return result;
+            return BaseResponse<string>.Failed(result.Errors.Select(x => x.Description));
         }
 
-        if (!await roleManager.RoleExistsAsync(request.Role))
+        if (!await roleManager.RoleExistsAsync(request.Role!))
         {
-            await roleManager.CreateAsync(new IdentityRole(request.Role));
+            await roleManager.CreateAsync(new IdentityRole(request.Role!));
         }
 
-        await userManager.AddToRoleAsync(user, request.Role);
-        return result;
+        await userManager.AddToRoleAsync(user, request.Role!);
+        return BaseResponse<string>.Succeeded(user.Id);
     }
 
-    public async ValueTask<AuthView> VerifyAppleMfaAsync(MfaRequest request, CancellationToken cancellationToken = default)
+    public async ValueTask<BaseResponse<AuthView>> VerifyAppleMfaAsync(MfaRequest request, CancellationToken cancellationToken = default)
     {  // Mock Apple Sign-In validation (requires Apple Developer setup in production)
         if (string.IsNullOrEmpty(request.Token) || !request.Token.StartsWith("mock_apple_"))
         {
-            return new AuthView { Succeeded = false, Message = "Invalid Apple token" };
+
+            return BaseResponse<AuthView>.Failed(["Invalid Apple token"]);
         }
         var email = request.Token.Replace("mock_apple_", "");
         var user = await userManager.FindByEmailAsync(email);
         if (user == null)
         {
-            return new AuthView { Succeeded = false, Message = "User not found" };
+            return BaseResponse<AuthView>.Failed(["User not found."]);
         }
         var token = GenerateJwtToken(user);
-        return new AuthView { Token = token, Succeeded = true, RequiresMfa = false };
+        var result = new AuthView { Token = token, RequiresMfa = false };
+        return BaseResponse<AuthView>.Succeeded(result);
     }
 
-    public async ValueTask<AuthView> VerifyGoogleMfaAsync(MfaRequest request, CancellationToken cancellationToken = default)
+    public async ValueTask<BaseResponse<AuthView>> VerifyGoogleMfaAsync(MfaRequest request, CancellationToken cancellationToken = default)
     {
         var settings = new GoogleJsonWebSignature.ValidationSettings
         {
@@ -62,10 +70,11 @@ IConfiguration configuration
         var user = await userManager.FindByEmailAsync(payload.Email);
         if (user == null)
         {
-            return new AuthView { Message = "User not found", Succeeded = false };
+            return BaseResponse<AuthView>.Failed(["User not found."]);
         }
         var token = GenerateJwtToken(user);
-        return new AuthView { Token = token, Succeeded = true, RequiresMfa = false };
+        var result = new AuthView { Token = token, RequiresMfa = false };
+        return BaseResponse<AuthView>.Succeeded(result);
     }
 
 

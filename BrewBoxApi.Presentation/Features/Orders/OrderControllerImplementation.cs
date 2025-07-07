@@ -20,7 +20,7 @@ public sealed class OrderControllerImplementation(IOrderRepository orderReposito
             Paid = false,
             Drinks = [.. request.Drinks.Select(d => new Drink
             {
-                Type = d.Type,
+                Type =Enum.Parse<DrinkType>(d.Type),
                 Size = d.Size,
                 Price = d.Price
             })]

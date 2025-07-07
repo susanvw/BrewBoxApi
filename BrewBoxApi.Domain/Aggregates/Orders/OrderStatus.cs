@@ -3,8 +3,9 @@ namespace BrewBoxApi.Domain.Aggregates.Orders;
 public enum OrderStatus
 {
     Placed,
+    Claimed,
     InProgress,
-    Complete,
-    Paid,
-    Collected
+    Ready,
+    Collected,
+    Cancelled
 }

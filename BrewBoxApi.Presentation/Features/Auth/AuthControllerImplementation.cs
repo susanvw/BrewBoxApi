@@ -1,9 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using BrewBoxApi.Presentation.Features.Account.RegisterCommand;
 using BrewBoxApi.Presentation.Features.Auth.LoginCommand;
 using BrewBoxApi.Presentation.Features.Auth.Models;
+using BrewBoxApi.Presentation.Features.SeedWork;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
@@ -14,75 +15,60 @@ internal sealed class AuthControllerImplementation(
     SignInManager<IdentityUser> signInManager,
     IConfiguration configuration) : IAuthControllerImplementation
 {
-    public async ValueTask<AuthView> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
+    public async ValueTask<BaseResponse<AuthView>> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
     {
-        var user = await userManager.FindByEmailAsync(request.Email);
-        
+        var validator = new LoginValidator();
+        await validator.ValidateAndThrowAsync(request, cancellationToken);
+
+        var user = await userManager.FindByEmailAsync(request.Email!);
+
         if (user == null)
         {
-            return new AuthView
-            {
-                Succeeded = false,
-                Message = "Invalid email or password"
-            };
+            return BaseResponse<AuthView>.Failed(["User could not be authenticated."]);
         }
 
-        var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, false);
-        if (!result.Succeeded)
+        var identityResult = await signInManager.CheckPasswordSignInAsync(user, request.Password!, false);
+        if (!identityResult.Succeeded)
         {
-            return new AuthView
-            {
-                Succeeded = false,
-                Message = "Invalid email or password"
-            };
+            return BaseResponse<AuthView>.Failed(["User could not be authenticated."]);
         }
 
         var token = await GenerateJwtTokenAsync(user, cancellationToken);
+        var roles = await userManager.GetRolesAsync(user);
 
-        return new AuthView
+        var result = new AuthView
         {
-            Succeeded = true,
             Token = token,
+            Roles = [.. roles],
             RefreshToken = ""
         };
+
+        return BaseResponse<AuthView>.Succeeded(result);
     }
 
-    public async Task<AuthView> ExternalLoginAsync(ClaimsPrincipal claims, CancellationToken cancellationToken = default)
+    public async ValueTask<BaseResponse<AuthView>> ExternalLoginAsync(ClaimsPrincipal claims, CancellationToken cancellationToken = default)
     {
         var email = claims.FindFirst(ClaimTypes.Email)?.Value;
         if (string.IsNullOrEmpty(email))
         {
-            return new AuthView
-            {
-                Message = "Email not provided by external provider",
-                Succeeded = false
-            };
+            return BaseResponse<AuthView>.Failed(["Email not provided by external provider."]);
         }
 
         var user = await userManager.FindByEmailAsync(email);
         if (user == null)
         {
             user = new IdentityUser { UserName = email, Email = email };
-            var result = await userManager.CreateAsync(user);
-            if (!result.Succeeded)
+            var identityResult = await userManager.CreateAsync(user);
+            if (!identityResult.Succeeded)
             {
-                return new AuthView
-                {
-                    Succeeded = false,
-                    Message = "Failed to create user",
-                    Details = result.Errors.Select(e => e.Description).ToList()
-                };
+                return BaseResponse<AuthView>.Failed(identityResult.Errors.Select(e => e.Description));
             }
         }
 
         var token = await GenerateJwtTokenAsync(user, cancellationToken);
 
-        return new AuthView
-        {
-            Succeeded = true,
-            Token = token,
-            RefreshToken = ""
-        };
+        var result = new AuthView { Token = token, RequiresMfa = false };
+        return BaseResponse<AuthView>.Succeeded(result);
     }
 
 

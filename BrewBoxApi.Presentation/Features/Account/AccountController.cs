@@ -13,12 +13,12 @@ public class AccountController(IAccountControllerImplementation implementation) 
     {
         var result = await implementation.RegisterAsync(request, cancellationToken);
 
-        if (!result.Succeeded)
+        if (!result.Success)
         {
-            return BadRequest(new { error = "Registration failed", details = result.Errors.Select(e => e.Description) });
+            return BadRequest(new { error = "Registration failed", details = result.Errors });
         }
 
-        return Ok(new { message = "User registered successfully" });
+        return Ok(result);
     }
 
     [HttpPost("mfa/google")]
@@ -28,7 +28,7 @@ public class AccountController(IAccountControllerImplementation implementation) 
         {
             var result = await implementation.VerifyGoogleMfaAsync(request, cancellationToken);
 
-            if (!result.Succeeded)
+            if (!result.Success)
             {
                 return BadRequest(result);
             }
@@ -50,7 +50,7 @@ public class AccountController(IAccountControllerImplementation implementation) 
         {
             var result = await implementation.VerifyAppleMfaAsync(request, cancellationToken);
 
-            if (!result.Succeeded)
+            if (!result.Success)
             {
                 return BadRequest(result);
             }

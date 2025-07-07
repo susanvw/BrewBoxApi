@@ -13,12 +13,12 @@ public class AuthController(IAuthControllerImplementation implementation) : Cont
         CancellationToken cancellationToken = default)
     {
         var result = await implementation.LoginAsync(request, cancellationToken);
-        if (!result.Succeeded)
+        if (!result.Success)
         {
-            return Unauthorized(new { error = result.Message });
+            return Unauthorized(new { errors = result.Errors });
         }
 
-        return Ok(new { result });
+        return Ok(result);
     }
 
     [HttpPost("external-login")]
@@ -32,9 +32,9 @@ public class AuthController(IAuthControllerImplementation implementation) : Cont
 
         var result = await implementation.ExternalLoginAsync(info, cancellationToken);
         
-        if (!result.Succeeded)
+        if (!result.Success)
         {
-            return Unauthorized(new { error = result.Message });
+            return Unauthorized(new { error = result.Errors });
         }
 
         return Ok(new { result });

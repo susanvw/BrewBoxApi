@@ -22,7 +22,7 @@ public sealed class OrderRepository(ApplicationDbContext context) : BaseReposito
     public async ValueTask<IEnumerable<Order>> GetAllActiveByUserIdAsync(string userId, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userId);
-        return await Where(o => o.CreatedById == userId && o.Status != OrderStatus.Collected && o.Status != OrderStatus.Paid, o => o.Drinks, o => o.CreatedBy, o => o.Barista)
+        return await Where(o => o.CreatedById == userId && o.Status != OrderStatus.Collected && o.Paid, o => o.Drinks, o => o.CreatedBy, o => o.Barista)
             .ToListAsync(cancellationToken);
     }
 }
