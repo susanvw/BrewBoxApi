@@ -35,7 +35,7 @@ public class OrdersController(IOrderControllerImplementation implementation) : C
     }
 
     [HttpPost]
-    public async Task<ActionResult<Order>> CreateAsync([FromBody] CreateOrderRequest request, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<string>> CreateAsync([FromBody] CreateOrderRequest request, CancellationToken cancellationToken = default)
     {
         var id = await implementation.AddAsync(request, cancellationToken);
         return CreatedAtAction(nameof(CreateAsync), new { id });

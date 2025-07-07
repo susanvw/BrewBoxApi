@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BrewBoxApi.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialSet : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -160,7 +160,7 @@ namespace BrewBoxApi.Infrastructure.Migrations
                 name: "Orders",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
                     BaristaId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     PickupTime = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -191,9 +191,9 @@ namespace BrewBoxApi.Infrastructure.Migrations
                 name: "Drinks",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
-                    OrderId = table.Column<string>(type: "nvarchar(36)", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
+                    OrderId = table.Column<string>(type: "nvarchar(64)", nullable: false),
+                    Type = table.Column<int>(type: "int", maxLength: 100, nullable: false),
                     Size = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     CreatedById = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true),

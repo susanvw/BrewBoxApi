@@ -21,7 +21,7 @@ public sealed class OrderControllerImplementation(IOrderRepository orderReposito
             Drinks = [.. request.Drinks.Select(d => new Drink
             {
                 Type =Enum.Parse<DrinkType>(d.Type),
-                Size = d.Size,
+                Size = Enum.Parse<DrinkSize>(d.Size),
                 Price = d.Price
             })]
         };

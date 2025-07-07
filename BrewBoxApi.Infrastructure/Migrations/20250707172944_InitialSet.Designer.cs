@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BrewBoxApi.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250706160714_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250707172944_InitialSet")]
+    partial class InitialSet
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,8 +28,8 @@ namespace BrewBoxApi.Infrastructure.Migrations
             modelBuilder.Entity("BrewBoxApi.Domain.Aggregates.Orders.Drink", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(16)
-                        .HasColumnType("nvarchar(16)");
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
 
                     b.Property<string>("CreatedById")
                         .HasMaxLength(450)
@@ -40,7 +40,7 @@ namespace BrewBoxApi.Infrastructure.Migrations
 
                     b.Property<string>("OrderId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(36)");
+                        .HasColumnType("nvarchar(64)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -50,10 +50,9 @@ namespace BrewBoxApi.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
+                    b.Property<int>("Type")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -67,8 +66,8 @@ namespace BrewBoxApi.Infrastructure.Migrations
             modelBuilder.Entity("BrewBoxApi.Domain.Aggregates.Orders.Order", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
 
                     b.Property<string>("BaristaId")
                         .HasColumnType("nvarchar(450)");

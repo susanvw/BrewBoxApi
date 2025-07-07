@@ -19,7 +19,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             builder.Entity<Order>(entity =>
             {
                   entity.HasKey(o => o.Id);
-                  entity.Property(o => o.Id).HasMaxLength(36);
+                  entity.Property(o => o.Id).HasMaxLength(64);
                   entity.Property(o => o.Status)
                         .HasConversion<string>()
                         .HasMaxLength(50);
@@ -43,7 +43,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             builder.Entity<Drink>(entity =>
             {
                   entity.HasKey(d => d.Id);
-                  entity.Property(d => d.Id).HasMaxLength(16);
+                  entity.Property(d => d.Id).HasMaxLength(64);
                   entity.Property(d => d.Type)
                         .HasMaxLength(100);
                   entity.Property(d => d.Size)
