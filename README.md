@@ -1,10 +1,9 @@
 # BrewBoxApi
+
 Drink order application
 
-
-dotnet ef migrations add InitialSet --startup-project ../BrewBoxApi.Presentation 
+dotnet ef migrations add InitialSet --startup-project ../BrewBoxApi.Presentation
 dotnet ef database update --startup-project ../BrewBoxApi.Presentation
-
 
 dotnet publish -c Release -o ./publish
 
