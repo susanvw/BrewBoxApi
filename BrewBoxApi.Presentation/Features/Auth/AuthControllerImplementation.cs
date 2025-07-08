@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using BrewBoxApi.Domain.Aggregates.Identity;
 using BrewBoxApi.Presentation.Features.Auth.LoginCommand;
 using BrewBoxApi.Presentation.Features.Auth.Models;
 using BrewBoxApi.Presentation.Features.SeedWork;
@@ -11,8 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 namespace BrewBoxApi.Presentation.Features.Auth;
 
 internal sealed class AuthControllerImplementation(
-    UserManager<IdentityUser> userManager,
-    SignInManager<IdentityUser> signInManager,
+    UserManager<ApplicationUser> userManager,
+    SignInManager<ApplicationUser> signInManager,
     IConfiguration configuration) : IAuthControllerImplementation
 {
     public async ValueTask<BaseResponse<AuthView>> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
@@ -49,6 +50,7 @@ internal sealed class AuthControllerImplementation(
     public async ValueTask<BaseResponse<AuthView>> ExternalLoginAsync(ClaimsPrincipal claims, CancellationToken cancellationToken = default)
     {
         var email = claims.FindFirst(ClaimTypes.Email)?.Value;
+        var name = claims.FindFirst(ClaimTypes.Name)?.Value;
         if (string.IsNullOrEmpty(email))
         {
             return BaseResponse<AuthView>.Failed(["Email not provided by external provider."]);
@@ -57,7 +59,7 @@ internal sealed class AuthControllerImplementation(
         var user = await userManager.FindByEmailAsync(email);
         if (user == null)
         {
-            user = new IdentityUser { UserName = email, Email = email };
+            user = new ApplicationUser { UserName = email, Email = email, DisplayName = name ?? "System" };
             var identityResult = await userManager.CreateAsync(user);
             if (!identityResult.Succeeded)
             {
@@ -72,7 +74,7 @@ internal sealed class AuthControllerImplementation(
     }
 
 
-    private async Task<string> GenerateJwtTokenAsync(IdentityUser user, CancellationToken cancellationToken = default)
+    private async Task<string> GenerateJwtTokenAsync(ApplicationUser user, CancellationToken cancellationToken = default)
     {
         var claims = new List<Claim>
         {

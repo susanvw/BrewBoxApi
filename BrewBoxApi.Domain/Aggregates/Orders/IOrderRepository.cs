@@ -8,4 +8,5 @@ public interface IOrderRepository
     ValueTask<Order> AddAsync(Order entity, CancellationToken cancellationToken = default);
     ValueTask UpdateAsync(Order entity, CancellationToken cancellationToken = default);
     ValueTask DeleteAsync(string id, CancellationToken cancellationToken = default);
+    ValueTask<IEnumerable<Order>> GetCurrentOrdersAsync(string userId, CancellationToken cancellationToken = default);
 }

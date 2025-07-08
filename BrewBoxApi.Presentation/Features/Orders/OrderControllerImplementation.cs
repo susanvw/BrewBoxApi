@@ -54,12 +54,29 @@ public sealed class OrderControllerImplementation(IOrderRepository orderReposito
         return OrderView.MapFrom(entity);
     }
 
+    public async ValueTask<List<OrderView>> GetCurrentOrdersAsync(CancellationToken cancellationToken = default)
+    {
+        var userId = currentUserService.UserId ?? throw new UnauthorizedAccessException("User could not be found.");
+
+        var list = await orderRepository.GetCurrentOrdersAsync(userId, cancellationToken);
+
+        return [.. list.Select(OrderView.MapFrom)];
+    }
+
     public async ValueTask UpdateAsync(string id, UpdateOrderStatusRequest request, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(id);
+        var userId = currentUserService.UserId ?? throw new UnauthorizedAccessException("User could not be found.");
 
         var order = await orderRepository.GetByIdAsync(id, cancellationToken);
-        order.Status = request.Status;
+        var orderStatus = Enum.Parse<OrderStatus>(request.Status);
+
+        if (orderStatus == OrderStatus.Claimed)
+        {
+            order.BaristaId = userId;
+        }
+
+        order.Status = orderStatus;
         await orderRepository.UpdateAsync(order, cancellationToken);
     }
 }

@@ -1,3 +1,4 @@
+using BrewBoxApi.Domain.Aggregates.Identity;
 using Microsoft.AspNetCore.Identity;
 
 namespace BrewBoxApi.Domain.SeedWork;
@@ -13,7 +14,7 @@ public  class BaseModel
     [PersonalData]
     public string Id { get; }
 
-    public IdentityUser CreatedBy { get; set; } = null!;
+    public ApplicationUser CreatedBy { get; set; } = null!;
     public string? CreatedById { get; set; }
     public DateTime? CreatedOn { get; set; }
 }

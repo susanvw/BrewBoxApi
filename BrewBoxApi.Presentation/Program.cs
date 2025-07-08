@@ -14,6 +14,7 @@ using BrewBoxApi.Presentation.Filters;
 using BrewBoxApi.Presentation.Services;
 using Microsoft.AspNetCore.Identity;
 using BrewBoxApi.Presentation.Features.Account;
+using BrewBoxApi.Domain.Aggregates.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,11 +22,12 @@ try
 {
     // Configure Entity Framework Core with Azure SQL
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+        options.UseSqlServer(builder.Configuration.GetConnectionString("BrewBoxConnection"))
                .AddInterceptors(new AuditInterceptor(builder.Services.BuildServiceProvider().GetRequiredService<ICurrentUserService>())));
 
+
     // Configure ASP.NET Identity
-    builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+    builder.Services.AddIdentity<ApplicationUser, IdentityRole<string>>(options =>
     {
         options.Password.RequireDigit = true;
         options.Password.RequiredLength = 8;
@@ -33,6 +35,7 @@ try
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+    
 
     // Configure CORS
     builder.Services.AddCors(options =>

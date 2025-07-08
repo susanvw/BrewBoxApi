@@ -1,12 +1,13 @@
 using BrewBoxApi.Domain.Aggregates.Orders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using BrewBoxApi.Domain.Aggregates.Identity;
 using Microsoft.AspNetCore.Identity;
 
 namespace BrewBoxApi.Infrastructure;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-      : IdentityDbContext<IdentityUser>(options)
+      : IdentityDbContext<ApplicationUser, IdentityRole<string>, string>(options)
 {
       public DbSet<Order> Orders { get; set; }
       public DbSet<Drink> Drinks { get; set; }

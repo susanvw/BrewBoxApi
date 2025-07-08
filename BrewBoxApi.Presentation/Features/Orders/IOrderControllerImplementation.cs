@@ -11,5 +11,6 @@ public interface IOrderControllerImplementation
     ValueTask<List<OrderView>> GetAllActiveByUserIdAsync(CancellationToken cancellationToken = default);
     ValueTask<List<OrderView>> GetAllByUserIdAsync(CancellationToken cancellationToken = default);
     ValueTask<OrderView> GetByIdAsync(string id, CancellationToken cancellationToken= default);
+    ValueTask<List<OrderView>>  GetCurrentOrdersAsync(CancellationToken cancellationToken = default);
     ValueTask UpdateAsync(string id, UpdateOrderStatusRequest request, CancellationToken cancellationToken = default);
 }

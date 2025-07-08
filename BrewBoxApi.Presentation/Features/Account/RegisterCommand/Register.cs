@@ -15,6 +15,7 @@ public sealed record RegisterRequest
     public string? Email { get; init; }
     public string? Password { get; init; }
     public string? Role { get; init; }
+    public string? DisplayName { get; init; }
 }
 
 internal sealed class RegisterValidator : AbstractValidator<RegisterRequest>
@@ -33,5 +34,8 @@ internal sealed class RegisterValidator : AbstractValidator<RegisterRequest>
         RuleFor(x => x.Role)
         .NotEmpty().WithMessage("Please provide a role name.")
         .IsEnumName(typeof(RoleType), false).WithMessage("Please provide an existing role.");
+
+        RuleFor(x => x.DisplayName)
+        .NotEmpty().WithMessage("Please provide a display name.");
     }
 }

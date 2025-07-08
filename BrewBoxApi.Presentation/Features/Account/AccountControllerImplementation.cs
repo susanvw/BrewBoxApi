@@ -10,12 +10,13 @@ using Google.Apis.Auth;
 using FluentValidation;
 using BrewBoxApi.Presentation.Features.SeedWork;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using BrewBoxApi.Domain.Aggregates.Identity;
 
 namespace BrewBoxApi.Presentation.Features.Account;
 
 internal sealed class AccountControllerImplementation(
-UserManager<IdentityUser> userManager,
-RoleManager<IdentityRole> roleManager,
+UserManager<ApplicationUser> userManager,
+RoleManager<IdentityRole<string>> roleManager,
 IConfiguration configuration
 ) : IAccountControllerImplementation
 {
@@ -25,7 +26,7 @@ IConfiguration configuration
         var validator = new RegisterValidator();
         await validator.ValidateAndThrowAsync(request, cancellationToken);
 
-        var user = new IdentityUser { UserName = request.Email, Email = request.Email };
+        var user = new ApplicationUser { Id = Guid.NewGuid().ToString(), UserName = request.Email, Email = request.Email, DisplayName = request.DisplayName! };
         var result = await userManager.CreateAsync(user, request.Password!);
 
         if (!result.Succeeded)
@@ -78,7 +79,7 @@ IConfiguration configuration
     }
 
 
-    private string GenerateJwtToken(IdentityUser user)
+    private string GenerateJwtToken(ApplicationUser user)
     {
         var claims = new[]
         {
