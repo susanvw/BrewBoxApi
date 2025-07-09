@@ -58,7 +58,8 @@ try
      {
          builder.WithOrigins(
                  "http://localhost:5173",
-                 "https://brewboxapp.azurewebsites.net")
+                 "https://brewboxapp.azurewebsites.net",
+                 "https://victorious-forest-0241ba20f.2.azurestaticapps.net")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials()
