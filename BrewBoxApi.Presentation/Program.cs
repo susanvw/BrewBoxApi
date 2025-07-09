@@ -15,11 +15,26 @@ using BrewBoxApi.Presentation.Services;
 using Microsoft.AspNetCore.Identity;
 using BrewBoxApi.Presentation.Features.Account;
 using BrewBoxApi.Domain.Aggregates.Identity;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 try
 {
+    // Configure Serilog
+    builder.Host.UseSerilog((context, services, configuration) =>
+    {
+        configuration
+            .ReadFrom.Configuration(context.Configuration)
+            .ReadFrom.Services(services)
+            .Enrich.FromLogContext()
+            .WriteTo.Console() // For local debugging
+            .WriteTo.ApplicationInsights(
+                telemetryConfiguration: null, // Uses default Application Insights configuration
+                telemetryConverter: TelemetryConverter.Traces,
+                restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);
+    });
+
     // Configure Entity Framework Core with Azure SQL
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("BrewBoxConnection"))
@@ -35,7 +50,7 @@ try
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-    
+
 
     // Configure CORS
     builder.Services.AddCors(options =>
@@ -146,7 +161,7 @@ try
             options.RoutePrefix = string.Empty; // Serve Swagger at root (/)
         });
     }
-
+    app.UseSerilogRequestLogging(); // Logs HTTP requests
     app.UseCors("AllowReactApp");
     app.UseHttpsRedirection();
     app.UseAuthentication();
@@ -158,5 +173,9 @@ try
 }
 catch (Exception ex)
 {
-    Console.Write(ex.Message);
+    Log.Fatal(ex, "Application failed to start");
+}
+finally
+{
+    Log.CloseAndFlush();
 }
