@@ -152,15 +152,15 @@ try
     var app = builder.Build();
 
     // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
-    {
+   // if (app.Environment.IsDevelopment())
+   // {
         app.UseSwagger();
         app.UseSwaggerUI(options =>
         {
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "BrewBox API V1");
             options.RoutePrefix = string.Empty; // Serve Swagger at root (/)
         });
-    }
+   // }
     app.UseSerilogRequestLogging(); // Logs HTTP requests
     app.UseCors("AllowReactApp");
     app.UseHttpsRedirection();
