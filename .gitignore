@@ -44,7 +44,6 @@ obj/
 
 Sensitive files
 
-appsettings.json 
 appsettings.Development.json
 secrets.json
 
