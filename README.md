@@ -11,3 +11,6 @@ cd publish
 zip -r ../brewboxapi.zip .
 
 az webapp deployment source config-zip --resource-group SvwDesignRG --name brewbox.azurewebsites.net --src ../brewboxapi.zip
+
+
+dotnet publish -c Release -o ../Publish -r linux-x64 --no-self-contained
