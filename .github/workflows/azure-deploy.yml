@@ -6,13 +6,14 @@ on:
       - main
 
 env:
-  AZURE_WEBAPP_NAME: brewbox  # App Service name
-  AZURE_WEBAPP_PACKAGE_PATH: '.'  # Project path
-  DOTNET_VERSION: '9.0.x'        # .NET 9 version
+  AZURE_WEBAPP_NAME: brewbox
+  AZURE_WEBAPP_PACKAGE_PATH: './publish'
+  DOTNET_VERSION: '9.0.x'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,11 +30,11 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish --configuration Release -r linux-x64 --self-contained false --output ./publish
+        run: dotnet publish --configuration Release --output ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ./publish
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
