@@ -52,18 +52,19 @@ try
     .AddDefaultTokenProviders();
 
 
-    // Configure CORS
     builder.Services.AddCors(options =>
-    {
-        options.AddPolicy("AllowReactApp", builder =>
-        {
-            builder.WithOrigins("http://localhost:5173")
-                   .AllowAnyMethod()
-                   .AllowAnyHeader()
-                   .AllowCredentials()
-                   .SetPreflightMaxAge(TimeSpan.FromSeconds(86400));
-        });
-    });
+ {
+     options.AddPolicy("AllowReactApp", builder =>
+     {
+         builder.WithOrigins(
+                 "http://localhost:5173",
+                 "https://brewbox-frontend.azurewebsites.net")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
+                .SetPreflightMaxAge(TimeSpan.FromSeconds(86400));
+     });
+ });
 
     // Configure Authorization
     builder.Services.AddAuthorization();
@@ -152,15 +153,15 @@ try
     var app = builder.Build();
 
     // Configure the HTTP request pipeline.
-   // if (app.Environment.IsDevelopment())
-   // {
-        app.UseSwagger();
-        app.UseSwaggerUI(options =>
-        {
-            options.SwaggerEndpoint("/swagger/v1/swagger.json", "BrewBox API V1");
-            options.RoutePrefix = string.Empty; // Serve Swagger at root (/)
-        });
-   // }
+    // if (app.Environment.IsDevelopment())
+    // {
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "BrewBox API V1");
+        options.RoutePrefix = string.Empty; // Serve Swagger at root (/)
+    });
+    // }
     app.UseSerilogRequestLogging(); // Logs HTTP requests
     app.UseCors("AllowReactApp");
     app.UseHttpsRedirection();
