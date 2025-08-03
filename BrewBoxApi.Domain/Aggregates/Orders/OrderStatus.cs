@@ -7,5 +7,6 @@ public enum OrderStatus
     InProgress,
     Ready,
     Collected,
-    Cancelled
+    Cancelled,
+    Paid
 }
