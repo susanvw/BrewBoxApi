@@ -57,3 +57,4 @@ node_modules/ dist/ *.log
 Mac-specific
 
 .DS_Store
+/BrewBoxApi.Presentation/appsettings.Development.json
