@@ -3,7 +3,7 @@ using BrewBoxApi.Application.CQRS.Account.MfaCommand;
 using BrewBoxApi.Application.CQRS.Account.RegisterCommand;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BrewBoxApi.Presentation;
+namespace BrewBoxApi.Presentation.Controllers.v1;
 
 [ApiController]
 [Route("api/[controller]")]

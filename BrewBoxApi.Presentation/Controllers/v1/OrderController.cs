@@ -6,7 +6,7 @@ using BrewBoxApi.Domain.Aggregates.Orders;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BrewBoxApi.Presentation;
+namespace BrewBoxApi.Presentation.Controllers.v1;
 
 [Authorize]
 [ApiController]
