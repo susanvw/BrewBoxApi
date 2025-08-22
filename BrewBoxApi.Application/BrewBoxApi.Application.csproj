@@ -1,15 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Remove="Common\Interfaces\**" />
+    <EmbeddedResource Remove="Common\Interfaces\**" />
+    <None Remove="Common\Interfaces\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BrewBoxApi.Domain\BrewBoxApi.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="12.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Common\Interfaces\" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.8" />
   </ItemGroup>
 
   <PropertyGroup>

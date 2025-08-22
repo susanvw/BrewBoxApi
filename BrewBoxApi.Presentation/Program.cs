@@ -7,15 +7,15 @@ using BrewBoxApi.Infrastructure;
 using BrewBoxApi.Infrastructure.Interceptors;
 using BrewBoxApi.Infrastructure.Repositories;
 using BrewBoxApi.Domain.Aggregates.Orders;
-using BrewBoxApi.Infrastructure.Identity;
-using BrewBoxApi.Presentation.Features.Auth;
-using BrewBoxApi.Presentation.Features.Orders;
 using BrewBoxApi.Presentation.Filters;
 using BrewBoxApi.Presentation.Services;
 using Microsoft.AspNetCore.Identity;
-using BrewBoxApi.Presentation.Features.Account;
 using BrewBoxApi.Domain.Aggregates.Identity;
 using Serilog;
+using BrewBoxApi.Application.CQRS.Auth;
+using BrewBoxApi.Application.CQRS.Orders;
+using BrewBoxApi.Application.Common.Identity;
+using BrewBoxApi.Application.CQRS.Account;
 
 var builder = WebApplication.CreateBuilder(args);
 

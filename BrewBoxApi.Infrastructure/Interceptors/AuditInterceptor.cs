@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using BrewBoxApi.Domain.SeedWork;
-using BrewBoxApi.Infrastructure.Identity;
+using BrewBoxApi.Application.Common.Identity;
 
 namespace BrewBoxApi.Infrastructure.Interceptors;
 

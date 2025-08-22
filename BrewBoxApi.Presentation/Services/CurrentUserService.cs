@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using BrewBoxApi.Infrastructure.Identity;
+using BrewBoxApi.Application.Common.Identity;
 
 namespace BrewBoxApi.Presentation.Services;
 

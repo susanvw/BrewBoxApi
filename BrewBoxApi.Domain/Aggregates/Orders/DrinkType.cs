@@ -1,11 +1,11 @@
-namespace BrewBoxApi.Domain.Aggregates.Orders
+namespace BrewBoxApi.Domain.Aggregates.Orders;
+
+public enum DrinkType
 {
-    public enum DrinkType
-    {
-        Espresso,
-        Latte,
-        Cappuccino,
-        Americano,
-        Mocha
-    }
+    Espresso,
+    Latte,
+    Cappuccino,
+    Americano,
+    Mocha,
+    DirtyChaiLatte
 }
