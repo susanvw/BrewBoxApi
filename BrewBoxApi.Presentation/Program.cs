@@ -16,6 +16,8 @@ using BrewBoxApi.Application.CQRS.Auth;
 using BrewBoxApi.Application.CQRS.Orders;
 using BrewBoxApi.Application.Common.Identity;
 using BrewBoxApi.Application.CQRS.Account;
+using BrewBoxApi.Application.CQRS.Statements;
+using BrewBoxApi.Domain.Aggregates.Drinks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,7 +37,9 @@ builder.Host.UseSerilog((context, services, configuration) =>
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-builder.Services.AddScoped<AuditInterceptor>(); // Register as scoped
+builder.Services.AddScoped<AuditInterceptor>();
+builder.Services.AddScoped<SoftDeleteInterceptor>();
+builder.Services.AddScoped<QueryLoggingInterceptor>();
 
 builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
 {
@@ -117,7 +121,10 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IAccountControllerImplementation, AccountControllerImplementation>();
 builder.Services.AddScoped<IAuthControllerImplementation, AuthControllerImplementation>();
 builder.Services.AddScoped<IOrderControllerImplementation, OrderControllerImplementation>();
+builder.Services.AddScoped<IStatementControllerImplementation, StatementControllerImplementation>();
+
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IDrinkRepository, DrinkPriceRepository>();
 
 // Add Exception Filter
 builder.Services.AddControllers(options =>
@@ -149,7 +156,7 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "Bearer"
                 }
             },
-            new string[] {}
+            Array.Empty<string>()
         }
     });
 });
