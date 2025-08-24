@@ -44,11 +44,6 @@ builder.Services.AddScoped<QueryLoggingInterceptor>();
 builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("BrewBoxConnection"));
-    options.AddInterceptors(
-         sp.GetRequiredService<AuditInterceptor>(),
-         sp.GetRequiredService<SoftDeleteInterceptor>(),
-         sp.GetRequiredService<QueryLoggingInterceptor>()
-     );
 });
 
 // Configure ASP.NET Identity
@@ -110,7 +105,6 @@ builder.Services.AddAuthentication(options =>
                 context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
                 context.Response.Headers.Append("Access-Control-Allow-Headers", "Authorization, Content-Type");
                 context.Response.Headers.Append("Access-Control-Allow-Credentials", "true");
-                return Task.CompletedTask;
             }
             return Task.CompletedTask;
         }
