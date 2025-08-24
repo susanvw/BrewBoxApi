@@ -1,5 +1,4 @@
 using BrewBoxApi.Application.CQRS.Account;
-using BrewBoxApi.Application.CQRS.Account.MfaCommand;
 using BrewBoxApi.Application.CQRS.Account.RegisterCommand;
 using Microsoft.AspNetCore.Mvc;
 

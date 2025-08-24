@@ -1,4 +1,4 @@
-namespace BrewBoxApi.Domain.Aggregates.Orders;
+namespace BrewBoxApi.Domain.Aggregates.Drinks;
 
 public enum DrinkType
 {

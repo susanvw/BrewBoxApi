@@ -12,7 +12,7 @@ public interface IOrderRepository : IBaseReadRepository<Order>, IBaseCommandRepo
     /// <summary>
     /// Get all orders that have not been paid yet.
     /// </summary>
-    ValueTask<IEnumerable<Order>> GetOutstandingPaymentsByCustomerAsync(string customerId, CancellationToken cancellationToken = default);
+    ValueTask<IEnumerable<Order>> GetOutstandingPaymentsByCustomerIdAsync(string customerId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Get all current orders for a user - not yet collected.

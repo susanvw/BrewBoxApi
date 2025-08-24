@@ -2,7 +2,6 @@ using BrewBoxApi.Application.CQRS.Orders;
 using BrewBoxApi.Application.CQRS.Orders.CreateOrderCommand;
 using BrewBoxApi.Application.CQRS.Orders.Models;
 using BrewBoxApi.Application.CQRS.Orders.UpdateOrderCommand;
-using BrewBoxApi.Domain.Aggregates.Orders;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,33 +21,27 @@ public class OrdersController(IOrderControllerImplementation implementation) : C
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<OrderView>>> GetAllByUserIdAsync(CancellationToken cancellationToken = default)
-    {
-        var orders = await implementation.GetAllByUserIdAsync(cancellationToken);
-        return Ok(orders);
-    }
-
-    [HttpGet("active")]
     [Authorize(Roles = "Customer")]
-    public async Task<ActionResult<IEnumerable<OrderView>>> GetAllActiveByUserIdAsync(CancellationToken cancellationToken = default)
+    public async Task<ActionResult<IEnumerable<OrderView>>> GetAllByCustomerIdAsync(CancellationToken cancellationToken = default)
     {
-        var orders = await implementation.GetAllActiveByUserIdAsync(cancellationToken);
+        var orders = await implementation.GetAllByCustomerIdAsync(cancellationToken);
         return Ok(orders);
     }
 
-    [HttpGet("current")]
+    [HttpGet("/customer")]
+    [Authorize(Roles = "Customer")]
+    public async Task<ActionResult<IEnumerable<OrderView>>> GetCurrentOrdersByCustomerIdAsync(CancellationToken cancellationToken = default)
+    {
+        var orders = await implementation.GetCurrentOrdersByCustomerIdAsync(cancellationToken);
+        return Ok(orders);
+    }
+
+    [HttpGet("/barista")]
     [Authorize(Roles = "Barista")]
-    public async Task<ActionResult<IEnumerable<OrderView>>> GetCurrentOrdersAsync(CancellationToken cancellationToken = default)
+    public async Task<ActionResult<IEnumerable<OrderView>>> GetCurrentOrdersByBaristaIdAsync(CancellationToken cancellationToken = default)
     {
-        var orders = await implementation.GetCurrentOrdersAsync(cancellationToken);
+        var orders = await implementation.GetCurrentOrdersByBaristaIdAsync(cancellationToken);
         return Ok(orders);
-    }
-
-    [HttpPost]
-    public async Task<ActionResult<string>> CreateAsync([FromBody] CreateOrderRequest request, CancellationToken cancellationToken = default)
-    {
-        var id = await implementation.AddAsync(request, cancellationToken);
-        return CreatedAtRoute("GetOrderById", new { id }, id);
     }
 
     [HttpPut("{id}/status")]
@@ -57,5 +50,20 @@ public class OrdersController(IOrderControllerImplementation implementation) : C
     {
         await implementation.UpdateAsync(id, request, cancellationToken);
         return NoContent();
+    }
+
+    [HttpPut("{id}/paid")]
+    [Authorize(Roles = "Barista")]
+    public async Task<IActionResult> MarkAsPaid(string id, CancellationToken cancellationToken = default)
+    {
+        await implementation.MarkAsPaidAsync(id, cancellationToken);
+        return NoContent();
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<string>> CreateAsync([FromBody] CreateOrderRequest request, CancellationToken cancellationToken = default)
+    {
+        var id = await implementation.AddAsync(request, cancellationToken);
+        return CreatedAtRoute("GetOrderById", new { id }, id);
     }
 }

@@ -38,66 +38,30 @@ public sealed class AuthControllerImplementation(
         var token = await GenerateJwtTokenAsync(user, cancellationToken);
         var roles = await userManager.GetRolesAsync(user);
 
-        var result = new AuthView
-        {
-            Token = token,
-            Roles = [.. roles],
-            RefreshToken = ""
-        };
-
-        return BaseResponse<AuthView>.Succeeded(result);
+        return BaseResponse<AuthView>.Succeeded(AuthView.MapFrom(token, roles));
     }
-
-    public async ValueTask<BaseResponse<AuthView>> ExternalLoginAsync(ClaimsPrincipal claims, CancellationToken cancellationToken = default)
-    {
-        var email = claims.FindFirst(ClaimTypes.Email)?.Value;
-        var name = claims.FindFirst(ClaimTypes.Name)?.Value;
-        if (string.IsNullOrEmpty(email))
-        {
-            return BaseResponse<AuthView>.Failed(["Email not provided by external provider."]);
-        }
-
-        var user = await userManager.FindByEmailAsync(email);
-        if (user == null)
-        {
-            user = new ApplicationUser { UserName = email, Email = email, DisplayName = name ?? "System" };
-            var identityResult = await userManager.CreateAsync(user);
-            if (!identityResult.Succeeded)
-            {
-                return BaseResponse<AuthView>.Failed(identityResult.Errors.Select(e => e.Description));
-            }
-        }
-
-        var token = await GenerateJwtTokenAsync(user, cancellationToken);
-
-        var result = new AuthView { Token = token, RequiresMfa = false };
-        return BaseResponse<AuthView>.Succeeded(result);
-    }
-
 
     private async Task<string> GenerateJwtTokenAsync(ApplicationUser user, CancellationToken cancellationToken = default)
     {
+        var jwtSettings = configuration.GetSection("Jwt");
+        ArgumentException.ThrowIfNullOrEmpty(jwtSettings["Key"]);
+
+        var jwtKey = jwtSettings["Key"]!;
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-            new Claim(ClaimTypes.NameIdentifier, user.Id)
+            new(JwtRegisteredClaimNames.Sub, user.Id),
+            new(JwtRegisteredClaimNames.Email, user.Email!),
+            new(ClaimTypes.NameIdentifier, user.Id)
         };
 
         var roles = await userManager.GetRolesAsync(user);
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-        var jwtSettings = configuration.GetSection("Jwt");
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var token = new JwtSecurityToken(
+        return new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
             issuer: jwtSettings["Issuer"],
             audience: jwtSettings["Audience"],
             claims: claims,
             expires: DateTime.UtcNow.AddHours(1),
-            signingCredentials: creds);
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
+            signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)), SecurityAlgorithms.HmacSha256)));
     }
 }
