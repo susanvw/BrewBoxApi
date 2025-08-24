@@ -17,7 +17,7 @@ RoleManager<IdentityRole<string>> roleManager
         var validator = new RegisterValidator();
         await validator.ValidateAndThrowAsync(request, cancellationToken);
 
-        var user = new ApplicationUser { Id = Guid.NewGuid().ToString(), UserName = request.Email, Email = request.Email, DisplayName = request.DisplayName! };
+        var user = new ApplicationUser { UserName = request.Email, Email = request.Email, DisplayName = request.DisplayName! };
         var result = await userManager.CreateAsync(user, request.Password!);
 
         if (!result.Succeeded)

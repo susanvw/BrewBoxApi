@@ -6,30 +6,31 @@ namespace BrewBoxApi.Infrastructure.Repositories;
 
 public sealed class OrderRepository(ApplicationDbContext context) : BaseRepository<Order>(context), IOrderRepository
 {
-    public async ValueTask<Order> GetByIdAsync(string id, CancellationToken cancellationToken = default)
+    public async ValueTask<IEnumerable<Order>> GetAllByCustomerIdAsync(string customerId, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(id);
-        return await FindAsync(id, cancellationToken, o => o.Drinks, o => o.CreatedBy, o => o.Barista);
-    }
-
-    public async ValueTask<IEnumerable<Order>> GetAllByUserIdAsync(string userId, CancellationToken cancellationToken = default)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(userId);
-        return await Where(o => o.CreatedById == userId, o => o.Drinks, o => o.CreatedBy, o => o.Barista)
+        ArgumentException.ThrowIfNullOrWhiteSpace(customerId);
+        return await Where(o => o.CreatedById == customerId, o => o.Drinks)
             .ToListAsync(cancellationToken);
     }
 
-    public async ValueTask<IEnumerable<Order>> GetAllActiveByUserIdAsync(string userId, CancellationToken cancellationToken = default)
+    public async ValueTask<IEnumerable<Order>> GetCurrentOrdersByCustomerIdAsync(string customerId, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(userId);
-        return await Where(o => o.CreatedById == userId && o.Status != OrderStatus.Collected && !o.Paid, o => o.Drinks, o => o.CreatedBy, o => o.Barista)
+        ArgumentException.ThrowIfNullOrWhiteSpace(customerId);
+        return await Where(o => o.CreatedById == customerId && o.Status != OrderStatus.Collected && !o.Paid, o => o.Drinks)
             .ToListAsync(cancellationToken);
     }
 
-    public async ValueTask<IEnumerable<Order>> GetCurrentOrdersAsync(string userId, CancellationToken cancellationToken = default)
+    public async ValueTask<IEnumerable<Order>> GetCurrentOrdersByBaristaIdAsync(string baristaId, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(userId);
-        return await Where(o => (o.BaristaId == userId || o.BaristaId == null) && o.Status != OrderStatus.Collected && !o.Paid, o => o.Drinks, o => o.CreatedBy, o => o.Barista)
+        ArgumentException.ThrowIfNullOrWhiteSpace(baristaId);
+        return await Where(o => (o.BaristaId == baristaId) && o.Status != OrderStatus.Collected && !o.Paid, o => o.Drinks)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async ValueTask<IEnumerable<Order>> GetOutstandingPaymentsByCustomerAsync(string customerId, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(customerId);
+        return await Where(o => o.CreatedById == customerId && o.Status == OrderStatus.Collected && !o.Paid, o => o.Drinks)
             .ToListAsync(cancellationToken);
     }
 }

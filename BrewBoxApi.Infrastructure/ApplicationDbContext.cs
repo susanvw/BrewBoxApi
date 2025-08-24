@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using BrewBoxApi.Domain.Aggregates.Identity;
 using Microsoft.AspNetCore.Identity;
+using BrewBoxApi.Domain.SeedWork;
+using System.Linq.Expressions;
 
 namespace BrewBoxApi.Infrastructure;
 
@@ -15,6 +17,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
       protected override void OnModelCreating(ModelBuilder builder)
       {
             base.OnModelCreating(builder);
+            // Apply global query filter for soft deletes
+            foreach (var entityType in builder.Model.GetEntityTypes()
+                .Where(t => typeof(BaseModel).IsAssignableFrom(t.ClrType)))
+            {
+                  builder.Entity(entityType.ClrType)
+                      .HasQueryFilter(GetIsNotDeletedFilter(entityType.ClrType));
+            }
 
             // Configure Order entity
             builder.Entity<Order>(entity =>
@@ -64,5 +73,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                         .HasForeignKey(d => d.CreatedById)
                         .OnDelete(DeleteBehavior.Restrict);
             });
+      }
+      private static LambdaExpression GetIsNotDeletedFilter(Type type)
+      {
+            var parameter = Expression.Parameter(type, "e");
+            var body = Expression.IsFalse(
+                Expression.Property(parameter, nameof(BaseModel.IsDeleted)));
+            return Expression.Lambda(body, parameter);
       }
 }

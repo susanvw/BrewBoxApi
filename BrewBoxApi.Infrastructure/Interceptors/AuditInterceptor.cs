@@ -24,15 +24,27 @@ public class AuditInterceptor(ICurrentUserService currentUserService) : SaveChan
     {
         if (context == null) return;
 
-        var entries = context.ChangeTracker
-            .Entries()
-            .Where(e => e.Entity is BaseModel && e.State == EntityState.Added);
+        var now = DateTime.UtcNow;
+        var userId = currentUserService.UserId ?? "System";
 
-        foreach (var entry in entries)
+        foreach (var entry in context.ChangeTracker.Entries<BaseModel>())
         {
-            var entity = (BaseModel)entry.Entity;
-            entity.CreatedOn = DateTime.UtcNow;
-            entity.CreatedById = currentUserService.UserId ?? "System";
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Entity.CreatedOn = now;
+                    entry.Entity.CreatedById = userId;
+                    break;
+                case EntityState.Modified:
+                    entry.Entity.ModifiedOn = now;
+                    entry.Entity.ModifiedById = userId;
+                    break;
+                case EntityState.Deleted:
+                    entry.Entity.DeletedOn = now;
+                    entry.Entity.DeletedById = userId;
+                    entry.Entity.IsDeleted = true;
+                    break;
+            }
         }
     }
 }

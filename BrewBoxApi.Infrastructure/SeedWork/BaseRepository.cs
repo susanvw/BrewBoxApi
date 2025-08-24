@@ -5,12 +5,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BrewBoxApi.Infrastructure.SeedWork;
 
-public abstract class BaseRepository<TModel>(ApplicationDbContext dbContext) where TModel : BaseModel
+public abstract class BaseRepository<TModel>(ApplicationDbContext dbContext) : IBaseReadRepository<TModel>, IBaseCommandRepository<TModel> where TModel : BaseModel
 {
     public IQueryable<TModel> FindAll(params Expression<Func<TModel, object>>[] includes)
     {
         var query = dbContext.Set<TModel>().AsNoTracking();
         return includes.Aggregate(query, (current, include) => current.Include(include));
+    }
+    public async ValueTask<IEnumerable<TModel>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Set<TModel>()
+            .ToListAsync(cancellationToken);
     }
 
     public IQueryable<TModel> Where(Expression<Func<TModel, bool>> expression, params Expression<Func<TModel, object>>[] includes)
@@ -20,7 +25,12 @@ public abstract class BaseRepository<TModel>(ApplicationDbContext dbContext) whe
             .AsNoTracking();
         return includes.Aggregate(query, (current, include) => current.Include(include));
     }
-
+    public async ValueTask<IEnumerable<TModel>> FindAsync(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Set<TModel>()
+            .Where(predicate)
+            .ToListAsync(cancellationToken);
+    }
     public async ValueTask<TModel> FindAsync(string id, CancellationToken cancellationToken = default, params Expression<Func<TModel, object>>[] includes)
     {
         ArgumentException.ThrowIfNullOrEmpty(id);
@@ -31,7 +41,11 @@ public abstract class BaseRepository<TModel>(ApplicationDbContext dbContext) whe
 
         return model;
     }
-
+    public async ValueTask<TModel?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Set<TModel>()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+    }
     public virtual async ValueTask<TModel?> FindOneByFilterAsync(Expression<Func<TModel, bool>> expression, CancellationToken cancellationToken = default, params Expression<Func<TModel, object>>[] includes)
     {
         var query = dbContext.Set<TModel>().AsQueryable();
@@ -74,11 +88,14 @@ public abstract class BaseRepository<TModel>(ApplicationDbContext dbContext) whe
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async ValueTask UpdateAsync(TModel entity, CancellationToken cancellationToken)
+    public async ValueTask<TModel> UpdateAsync(TModel entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
         dbContext.Set<TModel>().Update(entity);
         await dbContext.SaveChangesAsync(cancellationToken);
+
+
+        return entity;
     }
 }
